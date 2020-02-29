@@ -18,13 +18,13 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @PostMapping("/save")
-    public void save(@Valid @RequestBody BookRequest bookRequest) {
+    @PostMapping("/add")
+    public void save(@Valid BookRequest bookRequest) {
         bookService.save(bookRequest);
     }
 
     @PutMapping("/update")
-    public void update(@Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
+    public void update(@Valid BookUpdateRequest bookUpdateRequest) {
         bookService.update(bookUpdateRequest);
     }
 
@@ -34,12 +34,12 @@ public class BookController {
     }
 
     @GetMapping("/page")
-    public PageResponse<BookResponse> findAll(@Valid @RequestBody PaginationRequest pagination) {
+    public PageResponse<BookResponse> findAll(@Valid PaginationRequest pagination) {
         return bookService.findAll(pagination);
     }
 
     @DeleteMapping("/delete")
-    public void  delete(@NotNull Long id){
+    public void  delete(@NotNull Long id) {
         bookService.delete(id);
     }
 

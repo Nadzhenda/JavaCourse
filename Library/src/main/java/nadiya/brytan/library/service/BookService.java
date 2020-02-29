@@ -5,12 +5,15 @@ import nadiya.brytan.library.dto.request.BookUpdateRequest;
 import nadiya.brytan.library.dto.request.PaginationRequest;
 import nadiya.brytan.library.dto.response.BookResponse;
 import nadiya.brytan.library.dto.response.PageResponse;
+import nadiya.brytan.library.entity.Author;
 import nadiya.brytan.library.entity.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import nadiya.brytan.library.repository.BookRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,11 +21,13 @@ import java.util.stream.Collectors;
 public class BookService {
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private AuthorService authorService;
 
     public void save(BookRequest request) {
         Book book = new Book();
+        book.setAuthor(authorService.getAuthorById(request.getAuthorId()));
         book.setName(request.getName());
-        book.setAuthor(request.getAuthor());
         book.setLanguage(request.getLanguage());
         book.setPageNum(request.getPageNum());
         bookRepository.save(book);
@@ -38,8 +43,12 @@ public class BookService {
     }
 
     public void update(BookUpdateRequest request) {
-        Book book = new Book(request.getId(), request.getName(), request.getAuthor(),
-                    request.getLanguage(), request.getPageNum());
+        Book book = new Book();
+        book.setAuthor(authorService.getAuthorById(request.getAuthorId()));
+        book.setId(request.getId());
+        book.setName(request.getName());
+        book.setLanguage(request.getLanguage());
+        book.setPageNum(request.getPageNum());
         bookRepository.save(book);
     }
 

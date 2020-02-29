@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Library authors</title>
+		<style>
+			*{
+				text-align: center;
+			}
+            aside{
+                width:30%;
+                padding-top: 0;
+                position: absolute;
+            }
+            #left{
+                left:0;
+            }
+            #right{
+                right: 0;
+            }
+            article{
+                width: 30%;
+            }
+            aside,article {
+                display: inline-block;
+            }
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Library</h1>
+			<h2>Authors</h2>
+		</header>
+		<nav>
+			<a href="http://localhost:8080/index">
+				<input type="button" value="Main"/>
+			</a>
+			<input type="button" value="previous" id="previous"/>
+            <input type="button" value="next" id="next"/>
+		</nav>
+        <aside id="left">
+            <form name="search">
+                <p>Search</p>
+                <p>Id:</p>
+                <input type="text" name="id" required/>
+                <input type="button" value="search" id="submitSearch"/>
+            </form>
+            <form name="update">
+                <p>Update author</p>
+                <p>Id:</p>
+                <input type="text" name="id" required/>
+                <p>New info:</p>
+                <p>Name:</p>
+                <input type="text" name="name" required/>
+                <p>Country:</p>
+                <input type="text" name="country" required/>
+                <input type="button" value="update" id="submitUpdate"/>
+            </form>
+        </aside><article></article><aside id="right">
+            <form name="add">
+                <p>Add author</p>
+                <p>Name:</p>
+                <input type="text" name="name" required/>
+                <p>Country:</p>
+                <input type="text" name="country" required/>
+                <input type="button" value="add" id="submitAdd"/>
+            </form>
+            <form name="delete">
+                <p>Delete author</p>
+                <p>Id:</p>
+                <input type="text" name="id" required/>
+                <input type="button" value="delete" id="submitDelete"/>
+            </form></aside>
+		<footer></footer>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script>
+            var search = document.forms.search;
+            var update = document.forms.update;
+            var add = document.forms.add;
+            var deleteForm = document.forms.delete;
+			var url = "http://localhost:8080/author";
+			var totalPages = 0;
+			var totalElements;
+			var args = {
+				size: 10,
+				page: 0,
+				field: "id",
+				direction: "ASC"
+			};
+		
+			function setPage(response) {
+				$(".appended").remove();
+				$("article").append(function () {
+					var data = response.data;
+					var newNodes = "";
+					for (var i = 0; i < data.length; i++) {
+						newNodes +="<div class=\"appended\"<p> id:" + data[i].id + "</p>";
+						newNodes +="<p> name:" + data[i].name + "</p>";
+						newNodes +="<p> country:" + data[i].country + "</p></div>";
+					}
+					return newNodes;
+				});
+				$("nav").append(function () {
+					totalPages = response.totalPages;
+					totalElements = response.totalElements;
+					return "<div class=\"appended\"><p>Pages:" + totalPages + "</p><p>Page:" + (args.page + 1) + "</p><p>Elements:"+totalElements+"</p></div>";
+				})
+			}
+		
+			function getPage() {
+				$.get(
+					url+"/page",
+					args,
+					function (response) {
+						setPage(response);
+					},
+					"json"
+				);
+		
+			}
+		
+			$(document).ready(getPage());
+		
+			$("#next").click(function (event) {
+				if(args.page + 1 < totalPages) {
+					args.page += 1;
+					getPage();
+				}
+			});
+		
+			$("#previous").click(function (event) {
+				if(args.page > 0) {
+					args.page -= 1;
+					getPage();
+				}
+			});
+
+            $("#submitSearch").click(function (event) {
+                console.log(search.id.value);
+                var request = {
+                    id: search.id.value
+                }
+                $.get(
+                    url+"/find",
+                    request,
+                    function (response) {
+                        $(".search").remove();
+                        $("form[name~='search']").append(function () {
+                            var newNode = "";
+                            newNode +="<div class=\"search\"<p> id:" + response.id + "</p>";
+                            newNode +="<p> name:" + response.name + "</p>";
+                            newNode +="<p> country:" + response.country + "</p>";
+                            newNode +="<p> books:" + response.books + "</p></div>";
+                            return newNode;
+                        });
+                    },
+                    "json"
+                )
+            });
+
+            $("#submitUpdate").click(function (event) {
+                var request = {
+                    id: update.id.value,
+                    name: update.name.value,
+                    country: update.country.value
+                };
+                $.ajax({
+                    url: url+"/update",
+                    method: "PUT",
+                    data: request,
+                    success: location.reload()
+                });
+            });
+
+            $("#submitAdd").click(function () {
+                var request = {
+                    name: add.name.value,
+                    country: add.country.value
+                };
+                $.post(
+                    url + "/add",
+                    request,
+                    location.reload()
+                );
+            });
+
+            $("#submitDelete").click(function () {
+                var request = {
+                    id: deleteForm.id.value
+                };
+                $.ajax({
+                    url: url+"/delete",
+                    method: "DELETE",
+                    data: request,
+                    success: location.reload()
+                });
+            });
+
+		</script>
+	</body>
+</html>

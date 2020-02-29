@@ -12,8 +12,8 @@ import javax.validation.constraints.Positive;
 public class BookRequest {
     @NotBlank
     private String name;
-    @NotBlank
-    private String author;
+    @NotNull
+    private Long authorId;
     @NotBlank
     private String language;
     @NotNull
